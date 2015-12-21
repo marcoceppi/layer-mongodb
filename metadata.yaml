@@ -1,0 +1,29 @@
+name: mongodb
+summary: An open-source document database, and the leading NoSQL database
+maintainers:
+ - Marco Ceppi <marco@ceppi.net>
+description: |
+  MongoDB is a high-performance, open source, schema-free document-
+  oriented  data store that's easy to deploy, manage and use. It's
+  network accessible, written in C++ and offers the following features:
+
+  - Collection oriented storage - easy storage of object-style data
+  - Full index support, including on inner objects
+  - Query profiling
+  - Replication and fail-over support
+  - Efficient storage of binary data including large
+    objects (e.g. videos)
+  - Auto-sharding for cloud-level scalability (Q209)
+    High performance, scalability, and reasonable depth of functionality
+    are the goals for the project.
+tags:
+  - databases
+  - nosql
+provides:
+  database:
+    interface: mongodb
+  benchmark:
+    interface: benchmark
+peers:
+  replica-set:
+    interface: mongodb
