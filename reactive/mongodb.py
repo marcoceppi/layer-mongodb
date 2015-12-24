@@ -35,6 +35,8 @@ def configure():
         status_set('maintenance', 'installing mongodb')
         m.install()
         set_state('mongodb.installed')
+    else:
+        m.configure()
 
     update_status()
 

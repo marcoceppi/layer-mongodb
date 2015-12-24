@@ -21,6 +21,18 @@ def apt_key(key_id):
 
 class MongoDB(object):
     upstream_list = '/etc/apt/sources.list.d/mongodb.list'
+    config_file = '/etc/mongodb.conf'
+    # Juju configuration options used for MongoDB
+    config_options = ['dbpath', 'logpath', 'logappend', 'bind_ip', 'port',
+                      'journal', 'cpu', 'auth', 'verbose', 'objcheck', 'quota',
+                      'oplog', 'nocursors', 'nohints', 'noscripting',
+                      'notablescans', 'noprealloc', 'nssize', 'mms-token',
+                      'mms-name', 'mms-interval', 'oplogSize', 'opIdMem',
+                      'replicaset']
+    config_map = {
+        # JUJU CFG: MONGO CFG
+        'replicaset': 'replSet',
+    }
 
     def __init__(self, source, version=None):
         if source not in self.package_map.keys():
@@ -35,6 +47,11 @@ class MongoDB(object):
         apt_purge(self.packages())
         _run_apt_command(['apt-get', 'autoremove', '--purge', '--assume-yes'])
 
+    def configure(self, config):
+        cfg = {self.config_map.get(k, k): v
+               for k, v in iter(config.items()) if k in self.config_options}
+        self._render_config(cfg)
+
     def packages(self):
         return [p.format(self.version) for p in self.package_map[self.source]]
 
@@ -43,6 +60,10 @@ class MongoDB(object):
             f.write(self.upstream_repo.format(lsb_release()['DISTRIB_CODENAME']))
         apt_key('7F0CEB10')
         apt_key('EA312927')
+
+    def _render_config(self, cfg):
+        with open(self.config_file, 'w') as f:
+            f.write('\n'.join(['%s = %s' % (k, v) for (k, v) in cfg.items()]))
 
 
 class MongoDB20(MongoDB):
@@ -177,4 +198,3 @@ def mongodb(ver=None):
         return MongoDB()
 
     return search(ver)
-
