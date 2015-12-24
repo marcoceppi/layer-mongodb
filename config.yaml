@@ -28,7 +28,7 @@ options:
     type: string
     description: Maximum log size before rotating.
   bind_ip:
-    default: "all"
+    default: "0.0.0.0"
     type: string
     description: IP address that mongodb should listen for connections.
   port:
@@ -99,10 +99,6 @@ options:
     default: "disabled"
     type: string
     description: Ping interval for Mongo monitoring server ( in number of seconds )
-  autoresync:
-    default: False
-    type: boolean
-    description: Automatically resync if slave data is stale
   oplogSize:
     default: "default"
     type: string
@@ -119,46 +115,6 @@ options:
     default: True
     type: boolean
     description: Replica Set Admin UI (accessible via default_port + 1000)
-  replicaset_master:
-    default: auto
-    type: string
-    description: Replica Set master (optional). Possible values are 'auto' for automatic detection based on install time or 'host:port' to connect to 'host' on 'port' and register as a member.
-  master:
-    default: "self"
-    type: string
-    description: Who is the master DB. If not "self", put the Master DB here as "host:port"
-  config_server_port:
-    default: 27019
-    type: int
-    description: Port number to use for the config-server
-  config_server_dbpath:
-    default: "/mnt/var/lib/mongodb/configsvr"
-    type: string
-    description: The path where the config server data files will be kept.
-  config_server_logpath:
-    default: "/mnt/var/log/mongodb/configsvr.log"
-    type: string
-    description: The path where to send config server log data.
-  arbiter:
-    default: "disabled"
-    type: string
-    description: Enable arbiter mode. Possible values are 'disabled' for no arbiter, 'enable' to become an arbiter or 'host:port' to declare another host as an arbiter.  replicaset_master must be set for this option to work.
-  mongos_logpath:
-    default: "/mnt/var/log/mongodb/mongos.log"
-    type: string
-    description: The path where to send log data from the mongo router.
-  mongos_port:
-    default: 27021
-    type: int
-    description: Port number to use for the mongo router
-  extra_config_options:
-    default: "none"
-    type: string
-    description: Extra options ( comma separated ) to be included ( at the end ) in the mongodb.conf file.
-  extra_daemon_options:
-    default: "none"
-    type: string
-    description: Extra options ( exactly as you would type them in the command line ) to be added via the command line to the mongodb daemon
   backups_enabled:
     default: False
     type: boolean
