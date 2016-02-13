@@ -35,9 +35,8 @@ def configure():
         status_set('maintenance', 'installing mongodb')
         m.install()
         set_state('mongodb.installed')
-    else:
-        m.configure()
 
+    m.configure()
     update_status()
 
 
@@ -46,7 +45,7 @@ def update_status():
     if mongodb.installed():
         status_set('active', 'mongodb {}'.format(mongodb.version()))
     else:
-        status_set('active', 'unknown')
+        status_set('blocked', 'unable to install mongodb')
 
 
 if __name__ == '__main__':
