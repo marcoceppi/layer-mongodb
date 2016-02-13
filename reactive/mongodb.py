@@ -16,13 +16,6 @@ from charms import mongodb
 cfg = config()
 
 
-@hook('install')
-def package_setup():
-    #if config('source') == 'None':
-    #    arm64_trusty_quirk()
-    pass
-
-
 @hook('config-changed')
 def configure():
     if cfg.changed('version') and mongodb.installed():
