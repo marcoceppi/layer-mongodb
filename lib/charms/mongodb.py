@@ -17,7 +17,7 @@ from charmhelpers.core.host import (
 
 def apt_key(key_id):
     subprocess.check_call(['apt-key', 'adv', '--keyserver',
-                           'hkp://keyserver.ubuntu.com:80', '--recv', key_id])
+                           'hkps://keyserver.ubuntu.com', '--recv', key_id])
 
 class MongoDB(object):
     upstream_list = '/etc/apt/sources.list.d/mongodb.list'
