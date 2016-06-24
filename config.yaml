@@ -127,19 +127,3 @@ options:
     default: 7
     type: int
     description: "Number of backups to keep. Keeps one week's worth by default."
-  source:
-    type: string
-    default: None
-    description: >
-      Optional configuration to support use of additional sources such as:
-        - ppa:myteam/ppa
-        - cloud:precise-proposed/icehouse
-        - http://my.archive.com/ubuntu main
-      The last option should be used in conjunction with the key configuration
-      option.
-  key:
-    type: string
-    default: ""
-    description: >
-      Key ID to import to the apt keyring to support use with arbitary source
-      configuration from outside of Launchpad archives or PPA's.

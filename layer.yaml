@@ -1,1 +1,4 @@
-includes: ['layer:basic', 'interface:mongodb']
+includes:
+ - 'layer:basic'
+ - 'layer:apt'
+ - 'interface:mongodb'
