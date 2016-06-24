@@ -11,7 +11,7 @@ from charms.reactive import (
     main,
 )
 
-from charms import mongodb
+from charms.layer import mongodb
 
 cfg = config()
 
