@@ -19,6 +19,9 @@ description: |
 tags:
   - databases
   - nosql
+series:
+  - xenial
+  - trusty
 provides:
   database:
     interface: mongodb
