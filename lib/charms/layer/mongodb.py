@@ -2,6 +2,7 @@
 import os
 import warnings
 import subprocess
+import platform
 
 from charmhelpers.fetch import (
     apt_install,
@@ -150,6 +151,28 @@ class MongoDB32(MongoDB30):
     upstream_repo = 'deb http://repo.mongodb.org/apt/ubuntu {0}/mongodb-org/3.2 multiverse'
 
 
+class MongoDBzSeries(MongoDB32):
+    package_map = {
+        'archive': [
+            'mongodb-server',
+        ],
+    }
+
+    upstream_repo = 'deb http://ppa.launchpad.net/ubuntu-s390x-community/mongodb/ubuntu {0} main'
+
+    def __init__(self, source, version=None):
+        lsb = lsb_release()
+        year = lsb['DISTRIB_RELEASE'].split('.')[0]
+        if int(year) < 16:
+            raise Exception('{0} is not deployable on zSeries'.format(lsb['DISTRIB_CODENAME'])
+
+        super(MongoDBzSeries, self).__init__(source, version)
+
+    def add_upstream(self):
+        apt_key('3427B191')
+        super(MongoDBzSeries, self).add_upstream()
+
+
 def installed():
     return os.path.isfile('/usr/bin/mongo')
 
@@ -166,9 +189,15 @@ _distro_map = {
     'xenial': MongoDB26,
 }
 
+_arch_map = {
+    's390x': MongoDBzSeries,
+}
+
 def mongodb(ver=None):
     if not ver and installed():
         ver = version()
+    if platform.machine() in _arch_map:
+        return _arch_map[platform.machine()]('archive')
     if not ver or ver == 'archive':
         distro = lsb_release()['DISTRIB_CODENAME']
         if distro not in _distro_map.keys():
