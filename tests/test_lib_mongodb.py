@@ -39,6 +39,8 @@ class MongoDBTest(unittest.TestCase):
         self.assertEqual(type(mongodb.mongodb('archive')).__name__, 'MongoDB26')
         lsb.side_effect = [{'DISTRIB_CODENAME': 'trusty'}]
         self.assertEqual(type(mongodb.mongodb('archive')).__name__, 'MongoDB24')
+        lsb.side_effect = [{'DISTRIB_CODENAME': 'nogo'}]
+        self.assertRaises(Exception, mongodb.mongodb, 'archive')
 
     @patch('charms.layer.mongodb.platform')
     def test_mongodb_zseries(self, plat):
