@@ -164,7 +164,7 @@ class MongoDBzSeries(MongoDB32):
         lsb = lsb_release()
         year = lsb['DISTRIB_RELEASE'].split('.')[0]
         if int(year) < 16:
-            raise Exception('{0} is not deployable on zSeries'.format(lsb['DISTRIB_CODENAME'])
+            raise Exception('{0} is not deployable on zSeries'.format(lsb['DISTRIB_CODENAME']))
 
         super(MongoDBzSeries, self).__init__(source, version)
 
