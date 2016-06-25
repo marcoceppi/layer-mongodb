@@ -2,3 +2,4 @@
 __PYCACHE__
 *.pyc
 venv
+.coverage

@@ -1,0 +1,10 @@
+language: python
+python:
+  - "3.2"
+  - "3.4"
+  - "3.5"
+install: "pip install -r tests/requirements.txt; pip install python-coveralls"
+script: "nosetests --nologcapture --with-coverage --cover-package=charms --cover-package=reactive"
+after_success:
+  - coveralls
+
