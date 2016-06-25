@@ -2,3 +2,4 @@ includes:
  - 'layer:basic'
  - 'layer:apt'
  - 'interface:mongodb'
+repo: https://github.com/marcoceppi/layer-mongodb.git
