@@ -223,7 +223,7 @@ def mongodb(ver=None):
                 if m.__name__ == needle:
                     return m('upstream', version)
 
-        warnings.warn('No viable major version found, fallback to default')
-        return MongoDB()
+        warnings.warn('No viable major version found')
+        return None
 
     return search(ver)
