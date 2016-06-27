@@ -102,10 +102,6 @@ class MongoDB(object):
 
         return False
 
-    def add_member(self, host, port=None):
-        r = self.run('rs.add("{0}")'.format(host))
-        pass
-
 
 class MongoDB20(MongoDB):
     package_map = {
