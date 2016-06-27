@@ -291,7 +291,8 @@ class MongoDBZSeriesTest(unittest.TestCase):
         minit.assert_called_once()
 
         minit.reset_mock()
-        lsb.return_value = {'DISTRIB_RELEASE': '14.10'}
+        lsb.return_value = {'DISTRIB_RELEASE': '14.10',
+                            'DISTRIB_CODENAME': 'utopic'}
 
         self.assertRaises(Exception, mongodb.MongoDBzSeries, 'archive')
         minit.assert_not_called()
