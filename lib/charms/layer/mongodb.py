@@ -24,7 +24,10 @@ def _as_text(bytestring):
 
 # FIXME: Do this as a JSONDecoder, if possible
 def clean_json(s):
-    return _as_text(s).replace('ISODate(', '').replace(', 1', '').replace('Timestamp(', '').replace(')', '')
+    return _as_text(s).replace('ISODate(',
+                               '').replace(', 1',
+                                           '').replace('Timestamp(',
+                                                       '').replace(')', '')
 
 
 def apt_key(key_id):
@@ -70,7 +73,8 @@ class MongoDB(object):
 
     def add_upstream(self):
         with open(self.upstream_list, 'w') as f:
-            f.write(self.upstream_repo.format(lsb_release()['DISTRIB_CODENAME']))
+            distrib = lsb_release()['DISTRIB_CODENAME']
+            f.write(self.upstream_repo.format(distrib))
 
     def _render_config(self, cfg):
         with open(self.config_file, 'w') as f:
@@ -97,6 +101,10 @@ class MongoDB(object):
             return True
 
         return False
+
+    def add_member(self, host, port=None):
+        r = self.run('rs.add("{0}")'.format(host))
+        pass
 
 
 class MongoDB20(MongoDB):
@@ -204,7 +212,8 @@ class MongoDBzSeries(MongoDB32):
         lsb = lsb_release()
         year = lsb['DISTRIB_RELEASE'].split('.')[0]
         if int(year) < 16:
-            raise Exception('{0} is not deployable on zSeries'.format(lsb['DISTRIB_CODENAME']))
+            distrib = lsb['DISTRIB_CODENAME']
+            raise Exception('{0} is not deployable on zSeries'.format(distrib))
 
         super(MongoDBzSeries, self).__init__(source, version)
 
@@ -220,8 +229,10 @@ def installed():
 def version():
     if not installed():
         return None
-    return subprocess.check_output(['/usr/bin/mongo', '--version'],
-                                   stderr=subprocess.STDOUT).decode('UTF-8').split(': ')[1]
+    return subprocess.check_output(
+               ['/usr/bin/mongo', '--version'],
+               stderr=subprocess.STDOUT).decode('UTF-8').split(': ')[1]
+
 
 _distro_map = {
     'precise': MongoDB20,
@@ -229,9 +240,11 @@ _distro_map = {
     'xenial': MongoDB26,
 }
 
+
 _arch_map = {
     's390x': MongoDBzSeries,
 }
+
 
 def mongodb(ver=None):
     if not ver and installed():
@@ -256,7 +269,6 @@ def mongodb(ver=None):
         major, minor = [c for c in version.replace('.', '')[:2]]
         minor_range = reversed(range(0, int(minor) + 1))
         needles = ['MongoDB{0}{1}'.format(major, v) for v in minor_range]
-        versions = subclasses(MongoDB)
 
         for needle in needles:
             for m in subclasses(MongoDB):
