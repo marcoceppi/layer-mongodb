@@ -71,12 +71,11 @@ class MongoDB(object):
     def add_upstream(self):
         with open(self.upstream_list, 'w') as f:
             f.write(self.upstream_repo.format(lsb_release()['DISTRIB_CODENAME']))
-        apt_key('7F0CEB10')
-        apt_key('EA312927')
 
     def _render_config(self, cfg):
         with open(self.config_file, 'w') as f:
-            f.write('\n'.join(['%s = %s' % (k, v) for (k, v) in cfg.items()]))
+            f.write('\n'.join(
+                    sorted(['%s = %s' % (k, v) for (k, v) in cfg.items()])))
 
     def run(self, cmd):
         """Run a mongo command returns result of command as obj"""
@@ -118,6 +117,10 @@ class MongoDB20(MongoDB):
             apt_update()
 
         super(MongoDB20, self).install()
+
+    def add_upstream(self):
+        apt_key('7F0CEB10')
+        super(MongoDB20, self).add_upstream()
 
     def uninstall(self):
         super(MongoDB20, self).uninstall()
@@ -182,6 +185,10 @@ class MongoDB31(MongoDB30):
 
 class MongoDB32(MongoDB30):
     upstream_repo = 'deb http://repo.mongodb.org/apt/ubuntu {0}/mongodb-org/3.2 multiverse'
+
+    def add_upstream(self):
+        apt_key('EA312927')
+        super(MongoDB32, self).add_upstream()
 
 
 class MongoDBzSeries(MongoDB32):
