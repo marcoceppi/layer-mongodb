@@ -3,6 +3,7 @@ import os
 import warnings
 import subprocess
 import platform
+import json
 
 from charmhelpers.fetch import (
     apt_install,
@@ -16,9 +17,20 @@ from charmhelpers.core.host import (
 )
 
 
+def _as_text(bytestring):
+    """Naive conversion of subprocess output to Python string"""
+    return bytestring.decode("utf-8", "replace")
+
+
+# FIXME: Do this as a JSONDecoder, if possible
+def clean_json(s):
+    return _as_text(s).replace('ISODate(', '').replace(', 1', '').replace('Timestamp(', '').replace(')', '')
+
+
 def apt_key(key_id):
     subprocess.check_call(['apt-key', 'adv', '--keyserver',
                            'hkps://keyserver.ubuntu.com', '--recv', key_id])
+
 
 class MongoDB(object):
     upstream_list = '/etc/apt/sources.list.d/mongodb.list'
@@ -65,6 +77,27 @@ class MongoDB(object):
     def _render_config(self, cfg):
         with open(self.config_file, 'w') as f:
             f.write('\n'.join(['%s = %s' % (k, v) for (k, v) in cfg.items()]))
+
+    def run(self, cmd):
+        """Run a mongo command returns result of command as obj"""
+
+        p = subprocess.Popen(["mongo", "--quiet"], stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = p.communicate(input=cmd.encode('UTF-8'))
+        if p.returncode:
+            raise IOError("mongo command failed {!r}:\n"
+                          "{}".format(cmd, _as_text(err)))
+        return json.loads(clean_json(out))
+
+    def init_replicaset(self):
+        r = self.run('rs.initiate()')
+        if r['ok']:
+            return True
+
+        if r['errmsg'] == 'already initialized':
+            return True
+
+        return False
 
 
 class MongoDB20(MongoDB):

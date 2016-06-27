@@ -2,6 +2,7 @@
 import sys
 sys.path.append('lib')
 
+import json
 import unittest
 from mock import patch
 
@@ -30,6 +31,28 @@ class ExtraTest(unittest.TestCase):
         self.assertEqual(mongodb.version(), '5.5.9')
         mi.return_value = False
         self.assertIsNone(mongodb.version())
+
+    def test_as_text(self):
+        self.assertEqual('yoooo', mongodb._as_text('yoooo'.encode('UTF-8')))
+
+    def test_clean_json(self):
+        mock_json = b'''
+        {
+            "set" : "test",
+            "date" : ISODate("2016-06-26T17:41:09Z"),
+            "myState" : 3,
+            "members" : [
+                {
+                    "optime" : Timestamp(1466903785, 1),
+                    "optimeDate" : ISODate("2016-06-26T01:16:25Z")
+                }
+            ],
+            "ok" : 1
+        }'''
+
+        self.assertEqual('2016-06-26T17:41:09Z',
+                         json.loads(mongodb.clean_json(mock_json))['date'])
+
 
 class MongoDBTest(unittest.TestCase):
     @patch('charms.layer.mongodb.lsb_release')
@@ -103,3 +126,42 @@ class MongoDBClassTest(unittest.TestCase):
         m.uninstall()
         mapt.assert_called_with(['foo=99.9', 'baz'])
         mrac.assert_called_with(['apt-get', 'autoremove', '--purge', '--assume-yes'])
+
+    @patch('charms.layer.mongodb.subprocess')
+    def test_run(self, ms):
+        mjson = b'''
+        {
+            "ok": 1
+        }'''
+
+        com = ms.Popen.return_value
+        com.communicate.return_value = [mjson, None]
+        com.returncode = 0
+
+        self.assertEqual({'ok': 1}, mongodb.MongoDB('dummy').run('doit()'))
+        com.communicate.assert_called_with(input=b'doit()')
+
+    @patch('charms.layer.mongodb.subprocess')
+    def test_failed_run(self, ms):
+        com = ms.Popen.return_value
+        com.communicate.return_value = [None, b'Err']
+        com.returncode = 1
+
+        self.assertRaises(IOError, mongodb.MongoDB('dummy').run, 'fail()')
+
+    @patch.object(mongodb.MongoDB, 'run')
+    def test_init_replicaset(self, mrun):
+        mrun.return_value = {'ok': 1}
+        self.assertTrue(mongodb.MongoDB('dummy').init_replicaset())
+        mrun.assert_called_with('rs.initiate()')
+
+    @patch.object(mongodb.MongoDB, 'run')
+    def test_already_init_replicaset(self, mrun):
+        mrun.return_value = {'ok': 0, 'errmsg': 'already initialized'}
+        self.assertTrue(mongodb.MongoDB('dummy').init_replicaset())
+
+    @patch.object(mongodb.MongoDB, 'run')
+    def test_failed_init_replicaset(self, mrun):
+        mrun.return_value = {'ok': 0, 'errmsg': 'danger will robinson'}
+        self.assertFalse(mongodb.MongoDB('dummy').init_replicaset())
+
