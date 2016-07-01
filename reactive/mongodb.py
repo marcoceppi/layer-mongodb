@@ -37,7 +37,7 @@ def install():
 @when_not('mongodb.ready')
 def configure():
     m = mongodb.mongodb(config().get('version'))
-    m.configure()
+    m.configure(config())
     service_restart('mongodb')
     set_state('mongodb.ready')
 

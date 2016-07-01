@@ -2,4 +2,8 @@ includes:
  - 'layer:basic'
  - 'layer:apt'
  - 'interface:mongodb'
+options:
+  basic:
+    packages:
+      - gnupg-curl
 repo: https://github.com/marcoceppi/layer-mongodb.git
