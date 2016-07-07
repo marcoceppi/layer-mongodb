@@ -113,7 +113,8 @@ class MongoDB20(MongoDB):
         ],
     }
 
-    upstream_repo = 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen'
+    upstream_repo = ('deb http://downloads-distro.mongodb.org'
+                     '/repo/ubuntu-upstart dist 10gen')
 
     def install(self):
         if self.source == 'upstream':
@@ -162,7 +163,8 @@ class MongoDB30(MongoDB):
         ],
     }
 
-    upstream_repo = 'deb http://repo.mongodb.org/apt/ubuntu {0}/mongodb-org/3.0 multiverse'
+    upstream_repo = ('deb http://repo.mongodb.org/apt/ubuntu '
+                     '{0}/mongodb-org/3.0 multiverse')
 
     def install(self):
         self.add_upstream()
@@ -184,11 +186,13 @@ class MongoDB31(MongoDB30):
         ],
     }
 
-    upstream_repo = 'deb http://repo.mongodb.org/apt/ubuntu {0}/mongodb-org/3.1 multiverse'
+    upstream_repo = ('deb http://repo.mongodb.org/apt/ubuntu '
+                     '{0}/mongodb-org/3.1 multiverse')
 
 
 class MongoDB32(MongoDB30):
-    upstream_repo = 'deb http://repo.mongodb.org/apt/ubuntu {0}/mongodb-org/3.2 multiverse'
+    upstream_repo = ('deb http://repo.mongodb.org/apt/ubuntu '
+                     '{0}/mongodb-org/3.2 multiverse')
 
     def add_upstream(self):
         apt_key('EA312927')
@@ -202,7 +206,8 @@ class MongoDBzSeries(MongoDB32):
         ],
     }
 
-    upstream_repo = 'deb http://ppa.launchpad.net/ubuntu-s390x-community/mongodb/ubuntu {0} main'
+    upstream_repo = ('deb http://ppa.launchpad.net/ubuntu-s390x-community'
+                     '/mongodb/ubuntu {0} main')
 
     def __init__(self, source, version=None):
         lsb = lsb_release()

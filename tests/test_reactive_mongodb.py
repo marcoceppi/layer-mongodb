@@ -1,16 +1,17 @@
 
 import sys
-sys.path.append('.')
-sys.path.append('lib')
-
 import unittest
 from mock import patch, MagicMock, call
 
-from reactive import mongodb
+sys.path.append('.')
+sys.path.append('lib')
+
+from reactive import mongodb  # noqa: E402
 
 
 class MockConfig(MagicMock):
     _d = {'prev': {}, 'cur': {}}
+
     def previous(self, k):
         return self._d['prev'].get(k)
 
@@ -21,11 +22,13 @@ class MockConfig(MagicMock):
 class ReactiveTestCase(unittest.TestCase):
     patches = ['set_state', 'config', 'remove_state', 'status_set']
     callables = {'config': MockConfig}
+
     def setUp(self):
         for p in self.patches:
             c = self.callables.get(p, MagicMock)
             a = 'reactive.mongodb.{}'.format(p)
-            setattr(self, '{}_mock'.format(p), patch(a, new_callable=c).start())
+            setattr(self, '{}_mock'.format(p),
+                    patch(a, new_callable=c).start())
         super(ReactiveTestCase, self).setUp()
 
     def tearDown(self):
@@ -61,7 +64,10 @@ class ReactiveTest(ReactiveTestCase):
             call().install(),
         ])
 
-        self.remove_state_mock.assert_has_calls([call('mongodb.installed'), call('mongodb.ready')])
+        self.remove_state_mock.assert_has_calls([
+            call('mongodb.installed'),
+            call('mongodb.ready'),
+        ])
         self.set_state_mock.assert_called_with('mongodb.installed')
 
     @patch('reactive.mongodb.mongodb')
@@ -88,7 +94,8 @@ class ReactiveTest(ReactiveTestCase):
 
         mongodb.update_status()
 
-        self.status_set_mock.assert_called_with('blocked', 'unable to install mongodb')
+        self.status_set_mock.assert_called_with('blocked',
+                                                'unable to install mongodb')
 
     @patch('reactive.mongodb.mongodb')
     def test_update_status_installed(self, mgo):

@@ -1,20 +1,26 @@
 
 import sys
-sys.path.append('lib')
-
 import json
 import unittest
 from mock import patch
 
-from charms.layer import mongodb
+sys.path.append('lib')
+
+from charms.layer import mongodb  # noqa: E402
 
 
 class ExtraTest(unittest.TestCase):
     @patch('charms.layer.mongodb.subprocess')
     def test_apt_key(self, sp):
         mongodb.apt_key('1111111')
-        sp.check_call.assert_called_with(['apt-key', 'adv', '--keyserver',
-            'hkps://keyserver.ubuntu.com', '--recv', '1111111'])
+        sp.check_call.assert_called_with([
+            'apt-key',
+            'adv',
+            '--keyserver',
+            'hkps://keyserver.ubuntu.com',
+            '--recv',
+            '1111111'
+        ])
 
     @patch('charms.layer.mongodb.os')
     def test_installed(self, mos):
@@ -59,9 +65,11 @@ class MongoDBMethodTest(unittest.TestCase):
     @patch('charms.layer.mongodb.platform')
     def test_mongodb_archive(self, plt, lsb):
         lsb.side_effect = [{'DISTRIB_CODENAME': 'xenial'}]
-        self.assertEqual(type(mongodb.mongodb('archive')).__name__, 'MongoDB26')
+        self.assertEqual(type(mongodb.mongodb('archive')).__name__,
+                         'MongoDB26')
         lsb.side_effect = [{'DISTRIB_CODENAME': 'trusty'}]
-        self.assertEqual(type(mongodb.mongodb('archive')).__name__, 'MongoDB24')
+        self.assertEqual(type(mongodb.mongodb('archive')).__name__,
+                         'MongoDB24')
         lsb.side_effect = [{'DISTRIB_CODENAME': 'nogo'}]
         self.assertRaises(Exception, mongodb.mongodb, 'archive')
 
@@ -88,7 +96,7 @@ class MongoDBMethodTest(unittest.TestCase):
         with patch('charms.layer.mongodb.warnings') as mw:
             mv.return_value = '1.0'
             self.assertIsNone(mongodb.mongodb())
-
+            mw.warn.called_with('No viable major version found')
 
     @patch('charms.layer.mongodb.lsb_release')
     @patch('charms.layer.mongodb.platform')
@@ -97,6 +105,7 @@ class MongoDBMethodTest(unittest.TestCase):
         plat.machine.return_value = 's390x'
         self.assertEqual(type(mongodb.mongodb('archive')).__name__,
                          'MongoDBzSeries')
+
 
 class MongoDBTest(unittest.TestCase):
     def setUp(self):
@@ -125,7 +134,12 @@ class MongoDBTest(unittest.TestCase):
         m = mongodb.MongoDB('dummy', '99.9')
         m.uninstall()
         mapt.assert_called_with(['foo=99.9', 'baz'])
-        mrac.assert_called_with(['apt-get', 'autoremove', '--purge', '--assume-yes'])
+        mrac.assert_called_with([
+            'apt-get',
+            'autoremove',
+            '--purge',
+            '--assume-yes'
+        ])
 
     @patch('builtins.open')
     def test_render_config(self, mopen):
@@ -287,7 +301,7 @@ class MongoDBZSeriesTest(unittest.TestCase):
     @patch.object(mongodb.MongoDB32, '__init__')
     def test_init(self, minit, lsb):
         lsb.return_value = {'DISTRIB_RELEASE': '16.04'}
-        m = mongodb.MongoDBzSeries('archive')
+        mongodb.MongoDBzSeries('archive')
         minit.assert_called_once()
 
         minit.reset_mock()
@@ -296,7 +310,6 @@ class MongoDBZSeriesTest(unittest.TestCase):
 
         self.assertRaises(Exception, mongodb.MongoDBzSeries, 'archive')
         minit.assert_not_called()
-
 
     @patch('charms.layer.mongodb.apt_key')
     @patch('charms.layer.mongodb.lsb_release')
