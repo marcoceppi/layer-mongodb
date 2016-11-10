@@ -10,18 +10,31 @@ from reactive import mongodb  # noqa: E402
 
 
 class MockConfig(MagicMock):
-    _d = {'prev': {}, 'cur': {}}
+    _d = {'prev': {}, 'cur': {}, 'changed': {}}
 
     def previous(self, k):
         return self._d['prev'].get(k)
+
+    def changed(self, k):
+        return self._d['cur'].get(k) != self._d['prev'].get(k)
 
     def get(self, k, default=None):
         return self._d['cur'].get(k, default)
 
 
 class ReactiveTestCase(unittest.TestCase):
-    patches = ['set_state', 'config', 'remove_state', 'status_set', 'open_port']
-    callables = {'config': MockConfig}
+    patches = [
+        'set_state',
+        'config',
+        'remove_state',
+        'status_set',
+        'open_port',
+        'close_port'
+    ]
+
+    callables = {
+        'config': MockConfig,
+    }
 
     def setUp(self):
         for p in self.patches:
@@ -73,12 +86,32 @@ class ReactiveTest(ReactiveTestCase):
     @patch('reactive.mongodb.mongodb')
     @patch('reactive.mongodb.service_restart')
     def test_configure(self, msr, mgo):
-        self.config_mock._d['cur'] = {'version': 'archive'}
+        self.config_mock._d['cur'] = {'version': 'archive', 'port': 20}
 
         mongodb.configure()
 
         mgo.mongodb.assert_called_with('archive')
         mgo.mongodb.return_value.configure.assert_called()
+
+        self.open_port_mock.assert_called_with(20)
+
+        msr.assert_called_with('mongodb')
+
+        self.set_state_mock.assert_called_with('mongodb.ready')
+
+    @patch('reactive.mongodb.mongodb')
+    @patch('reactive.mongodb.service_restart')
+    def test_configure_port(self, msr, mgo):
+        self.config_mock._d['prev'] = {'port': 80}
+        self.config_mock._d['cur'] = {'version': 'archive', 'port': 9001}
+
+        mongodb.configure()
+
+        mgo.mongodb.assert_called_with('archive')
+        mgo.mongodb.return_value.configure.assert_called()
+
+        self.close_port_mock.assert_called_with(80)
+        self.open_port_mock.assert_called_with(9001)
 
         msr.assert_called_with('mongodb')
 

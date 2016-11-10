@@ -45,8 +45,8 @@ def configure():
 
     if c.changed('port') and c.previous('port'):
         close_port(c.previous('port'))
-    open_port(c['port'])
 
+    open_port(c.get('port'))
     set_state('mongodb.ready')
 
 
