@@ -1,6 +1,8 @@
 from charmhelpers.core.hookenv import (
     config,
     status_set,
+    open_port,
+    close_port,
 )
 
 from charmhelpers.core.host import service_restart
@@ -36,9 +38,15 @@ def install():
 @when('mongodb.installed')
 @when_not('mongodb.ready')
 def configure():
-    m = mongodb.mongodb(config().get('version'))
-    m.configure(config())
+    c = config()
+    m = mongodb.mongodb(c.get('version'))
+    m.configure(c)
     service_restart('mongodb')
+
+    if c.changed('port') and c.previous('port'):
+        close_port(c.previous('port'))
+    open_port(c['port'])
+
     set_state('mongodb.ready')
 
 

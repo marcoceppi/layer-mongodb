@@ -129,7 +129,7 @@ class MongoDBTest(unittest.TestCase):
         mapt.assert_called_with(['foo=99.9', 'baz'])
 
     @patch('charms.layer.mongodb.apt_purge')
-    @patch('charms.layer.mongodb._run_apt_command')
+    @patch('subprocess.check_call')
     def test_uninstall(self, mrac, mapt):
         m = mongodb.MongoDB('dummy', '99.9')
         m.uninstall()

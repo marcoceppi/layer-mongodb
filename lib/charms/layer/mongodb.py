@@ -9,7 +9,6 @@ from charmhelpers.fetch import (
     apt_install,
     apt_purge,
     apt_update,
-    _run_apt_command,
 )
 
 from charmhelpers.core.host import (
@@ -42,9 +41,9 @@ class MongoDB(object):
     config_options = ['dbpath', 'logpath', 'logappend', 'bind_ip', 'port',
                       'journal', 'cpu', 'auth', 'verbose', 'objcheck', 'quota',
                       'oplog', 'nocursors', 'nohints', 'noscripting',
-                      'notablescans', 'noprealloc', 'nssize', 'mms-token',
-                      'mms-name', 'mms-interval', 'oplogSize', 'opIdMem',
-                      'replicaset']
+                      'notablescans', 'noprealloc', 'nssize',
+                      #'mms-token', 'mms-name', 'mms-interval',
+                      'oplogSize', 'opIdMem', 'replicaset']
     config_map = {
         # JUJU CFG: MONGO CFG
         'replicaset': 'replSet',
@@ -61,11 +60,11 @@ class MongoDB(object):
 
     def uninstall(self):
         apt_purge(self.packages())
-        _run_apt_command(['apt-get', 'autoremove', '--purge', '--assume-yes'])
+        subprocess.check_call(['apt-get', 'autoremove', '--purge', '--assume-yes'])
 
     def configure(self, config):
         cfg = {self.config_map.get(k, k): v
-               for k, v in iter(config.items()) if k in self.config_options}
+               for k, v in iter(config.items()) if v and k in self.config_options}
         self._render_config(cfg)
 
     def packages(self):

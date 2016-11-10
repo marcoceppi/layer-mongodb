@@ -20,7 +20,7 @@ class MockConfig(MagicMock):
 
 
 class ReactiveTestCase(unittest.TestCase):
-    patches = ['set_state', 'config', 'remove_state', 'status_set']
+    patches = ['set_state', 'config', 'remove_state', 'status_set', 'open_port']
     callables = {'config': MockConfig}
 
     def setUp(self):

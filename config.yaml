@@ -47,10 +47,11 @@ options:
     default: False
     type: boolean
     description: Turn on/off security
-  verbose:
-    default: False
-    type: boolean
-    description: Verbose logging output
+  #verbose:
+  # TODO: need to transform this into "v"'s for config
+    #default: False
+    #type: boolean
+    #description: Verbose logging output
   objcheck:
     default: False
     type: boolean
@@ -84,27 +85,25 @@ options:
     type: boolean
     description: Disable data file preallocation
   nssize:
-    default: "default"
     type: string
     description: Specify .ns file size for new databases
-  mms-token:
-    default: "disabled"
-    type: string
-    description: Accout token for Mongo monitoring server
-  mms-name:
-    default: "disabled"
-    type: string
-    description: Server name for Mongo monitoring server
-  mms-interval:
-    default: "disabled"
-    type: string
-    description: Ping interval for Mongo monitoring server ( in number of seconds )
+  # TODO: these mms-* options don't work on 2.6
+  #mms-token:
+    #default: "disabled"
+    #type: string
+    #description: Accout token for Mongo monitoring server
+  #mms-name:
+    #default: "disabled"
+    #type: string
+    #description: Server name for Mongo monitoring server
+  #mms-interval:
+    #default: "disabled"
+    #type: string
+    #description: Ping interval for Mongo monitoring server ( in number of seconds )
   oplogSize:
-    default: "default"
     type: string
     description: Custom size for replication operation log
   opIdMem:
-    default: "default"
     type: string
     description: Size limit for in-memory storage of op ids
   replicaset:
