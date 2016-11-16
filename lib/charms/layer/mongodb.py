@@ -42,7 +42,6 @@ class MongoDB(object):
                       'journal', 'cpu', 'auth', 'verbose', 'objcheck', 'quota',
                       'oplog', 'nocursors', 'nohints', 'noscripting',
                       'notablescans', 'noprealloc', 'nssize',
-                      #'mms-token', 'mms-name', 'mms-interval',
                       'oplogSize', 'opIdMem', 'replicaset']
     config_map = {
         # JUJU CFG: MONGO CFG
@@ -60,11 +59,19 @@ class MongoDB(object):
 
     def uninstall(self):
         apt_purge(self.packages())
-        subprocess.check_call(['apt-get', 'autoremove', '--purge', '--assume-yes'])
+        subprocess.check_call([
+            'apt-get',
+            'autoremove',
+            '--purge',
+            '--assume-yes'
+        ])
 
     def configure(self, config):
-        cfg = {self.config_map.get(k, k): v
-               for k, v in iter(config.items()) if v and k in self.config_options}
+        cfg = {
+            self.config_map.get(k, k): v
+            for k, v in iter(config.items()) if v and k in self.config_options
+        }
+
         self._render_config(cfg)
 
     def packages(self):
